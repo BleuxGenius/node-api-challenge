@@ -4,6 +4,7 @@ const actions = require('../data/helpers/actionModel.js');
 const middleware = require('../middleware.js');
 
 router.use(express.json());
+// router.use('/api', actions);
 
 
 router.get('/', (req, res, next) => {
@@ -40,7 +41,7 @@ router.post('/', middleware.validate('project_id'), middleware.validate('descrip
     .catch(error => next(error));
 });
 
-routere.delete('/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
     actions.remove(req.params.id)
     .then(count => {
         if (count > 0) {
