@@ -1,19 +1,19 @@
 const express = require('express');
+const router = express.Router();
 
 const projects = require('../data/helpers/projectModel.js');
 const middleware = require('../middleware')
 
-const router = express.Router();
 
-router.use(express.json());
+
 
 // get the list of projects
-router.get("/", (req, res, next) => {
+router.get("/", (req, res) => {
     projects.get()
     .then(project => {
         res.status(200).json(project);
     })
-    .catch(error => next(error));
+    .catch(error => (error));
 });
 
 // get projects by specified id
@@ -36,7 +36,7 @@ router.get('/:id', (req, res) => {
 });
 
 // get the actions from the projects based off id
-router.get('/:id/actions', (req, res) => {
+router.get('/:id/', (req, res) => {
     projects.getProjectActions(req.params.id)
     .then(post => {
         if (post) {
@@ -64,7 +64,7 @@ projects.insert(req.body)
 });
 
 // delete post based of specified id 
-router.delete('/', (req, res) => {
+router.delete('/:id', (req, res) => {
     projects.remove(req.params.id)
     .then(count => {
         if (count > 0) {

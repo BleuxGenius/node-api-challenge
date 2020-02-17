@@ -1,18 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const actions = require('../data/helpers/actionModel.js');
+const projects = require('../data/helpers/projectModel')
 const middleware = require('../middleware.js');
 
-router.use(express.json());
-// router.use('/api', actions);
 
+// router.get('/', (req, res, next) => {
+//     actions.get()
+//     .then(action => {
+//         res.status(200).json(action);
+//     })
+//     .catch(error => next(error));
+// });
 
-router.get('/', (req, res, next) => {
-    actions.get()
-    .then(action => {
-        res.status(200).json(action);
-    })
-    .catch(error => next(error));
+router.get('/', (req, res) => {
+   actions.get()
+   .then(action => {
+       res.status(200).json(action);
+   })
+   .catch(err => {
+       console.log(err);
+       res.status(500).json({ error: 'the actions information could not be found'})
+   });
 });
 
 router.get('/:id', (req, res) => {
@@ -33,12 +42,31 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.post('/', middleware.validate('project_id'), middleware.validate('description'), middleware.validate('notes'), (req, res, next) => {
+// taken out 
+// middleware.validate('notes'), =>
+
+router.post('/', middleware.validate('project_id'), middleware.validate('description'), (req, res, next) => {
     actions.insert(req.body)
     .then(action => {
         res.status(201).json(action);
     })
     .catch(error => next(error));
+});
+
+router.post('/', (req, res)=> {
+    // const body = req.body;
+    const id = req.params.id;
+    const newAction = {...body, project_id: id};
+
+    actions.insert("actions")
+    .then(newAction => {
+        res.status(200).json(newAction)
+    })
+    .catch(err => {
+        res.status(500).json({
+            errorMessage: `there was an error while saving the action ${err}`
+        });
+    });
 });
 
 router.delete('/:id', (req, res) => {
@@ -59,4 +87,15 @@ router.delete('/:id', (req, res) => {
     });
 });
 
+// router.put('/:id', (req, res) => {
+//     actions.insert(req.params.id)
+//     .then(newAction => {
+//         res.status(200).json(newAction)
+//     })
+//     .catch(err => {
+//         res.status(200).json({errorMessage : `there was an error adddng the action ${err}`
+//     });
+// })
+// })
 
+module.exports = router;
