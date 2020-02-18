@@ -20,8 +20,9 @@ server.get('/', logger, (req, res) => {
 module.exports = server;
 
 function logger(req, res, next) {
-    console.log(`${req.method} Request to ${req.orginalUrl}`);
+    console.log(`${req.method} Request to ${req.orginalUrl} at ${new Date().toISOString()}`);
     
     next();
 }
 
+module.exports = server;

@@ -17,7 +17,7 @@ router.get("/", (req, res) => {
 });
 
 // get projects by specified id
-router.get('/:id', (req, res) => {
+router.get('/:id/', middleware.validate, (req, res) => {
     projects.get(req.params.id)
     .then(post => {
         if (post) {
@@ -30,7 +30,7 @@ router.get('/:id', (req, res) => {
         // log error to server 
         console.log(error);
         res.status(500).json({
-            message: `Error retrieving the porject`,
+            message: `Error retrieving the project`,
         });
     });
 });
@@ -55,47 +55,52 @@ router.get('/:id/', (req, res) => {
 });
 
 // validated a post based off name and description 
-router.post('/', middleware.validate('name'), middleware.validate('description'), (req, res, next) =>{
-projects.insert(req.body)
-.then(project => {
-    res.status(201).json(project);
-})
-.catch(error => next(error));
+router.post('/', middleware.validate('name'), middleware.validate('description'), (req, res, next) => {
+    const { name , description} = req.body;
+if (name && description){
+    projects.insert(req.body)
+    .then(project => {
+        res.status(201).json(project);
+    })
+    .catch(error => {
+            res.status(500).json({error: 'could not add project to database'});
+    });
+
+} else {
+    res.status(400).json({error: 'required fields: name and description'})
+}
 });
 
 // delete post based of specified id 
-router.delete('/:id', (req, res) => {
-    projects.remove(req.params.id)
-    .then(count => {
-        if (count > 0) {
-            res.status(200).json({ message: 'the user has been removed'});
-        } else {
-            res.status(404).json({ message: 'The user could not be found'})
-        }
+router.delete('/:id', middleware.validate('name'), middleware.validate('description'), (req, res) => {
+    const { id } = req.params;
+    projects.remove(id)
+    .then(results => {
+            res.status(200).json({ message: 'project has been removed'});
     })
     .catch(error => {
         // log error to server 
         console.log (error);
         res.status(500).json({
-            message: ' Error removing the user '
-        });
-    });
+            message: ' Error removing this project ' });
+    })
  });
 
-    router.put('/:id', (req, res) => {
-        projects.update(req.params.id, req.body)
-        .then(user => {
-            if (user) {
-                res.status(404).json({ message: 'The user could not be found'});
-            }
-        })
-        .catch(error => {
-            // log error to server
-            console.log(error);
-            res.status(500).json({
-                message: 'Error updating user',
-            });
-        });
+    router.put('/:id', middleware.validate('name'), middleware.validate('description'), (req, res) => {
+       const { id } = req.params;
+       const {name, description} = req.body;
+
+       if (name && description) {
+           projects.update(id, {name, description})
+           .then(project => {
+               res.status(200).json(project);
+           })
+           .catch(error => {
+               res.status(500).json({error: 'Project could not be updated'})
+           });
+       } else {
+           res.status(400).json({error: 'required fields: Name and Description'})
+       }
     });
 
     module.exports = router;

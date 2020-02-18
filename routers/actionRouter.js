@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-    actions.get(req.params.id)
+    actions.get(id)
     .then(action => {
         if (action) {
             res.status(200).json(action);
@@ -87,15 +87,15 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-// router.put('/:id', (req, res) => {
-//     actions.insert(req.params.id)
-//     .then(newAction => {
-//         res.status(200).json(newAction)
-//     })
-//     .catch(err => {
-//         res.status(200).json({errorMessage : `there was an error adddng the action ${err}`
-//     });
-// })
-// })
+router.put('/:id', (req, res) => {
+    actions.insert(req.params.id)
+    .then(newAction => {
+        res.status(200).json(newAction)
+    })
+    .catch(err => {
+        res.status(200).json({errorMessage : `there was an error adddng the action ${err}`
+    });
+})
+})
 
 module.exports = router;
